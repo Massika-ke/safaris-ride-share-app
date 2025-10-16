@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Twilio\TwilioChannel;
 use NotificationChannels\Twilio\TwilioSmsMessage;
 
 class LoginNeedsVerification extends Notification
@@ -27,7 +28,7 @@ class LoginNeedsVerification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['TwilioChannel::class'];
+        return [TwilioChannel::class];
     }
 
     /**
