@@ -58,19 +58,44 @@ class TripController extends Controller
 
     public function start(Request $request, Trip $trip)
     {
+        // driver starts the trip, taking the passenger
+        $trip->update([
+            'is_started' => true
+        ]);
 
+        $trip->load('driver.user');
+
+        return $trip;
     }
 
 
     public function end(Request $request, Trip $trip)
     {
+        // driver ends the trip
+        $trip->update([
+            'is_complete' => true
+        ]);
 
+        $trip->load('driver.user');
+
+        return $trip;
     }
 
 
     public function location(Request $request, Trip $trip)
     {
+        // update the driver's current location
+        $request->validate([
+            'driver_location' => 'required'
+        ]);
 
+        $trip->update([
+            'driver_location' => $request->driver_location
+        ]);
+
+        $trip->load('driver.user');
+
+        return $trip;
     }
 }
 
