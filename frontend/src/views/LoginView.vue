@@ -1,42 +1,41 @@
-<template>
-    <div class="pt-16">
-        <h1 class="text-3xl font-semibold mb-4">Enter your phone number</h1>
-        <form action="#" @submit.prevent="handleLogin">
-            <div class="overflow-hidden shadow sm:rounded-md max-w-sm mx-auto text-left">
-                <div class="bg-white px-4 py-5 sm:p-6">
-                    <div>
-                        <input type="text" v-maska data-maska="## ########" v-model="credentials.phone" name="phone" placeholder="xx xxxxxxxx"
-                        class="mt-1 block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm">
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 text-right sm:px-6">
-                    <button type="submit" @submit="handleLogin" class="inline-flex justify-center rounded-md border border-transparent bg-black py-2 px-2 text-white">
-                        Continue
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-
-</template>
-
 <script setup>
+import router from "@/router"
 import axios from "axios"
 import { vMaska } from "maska/vue"
-import { reactive } from "vue"
+import { computed, onMounted, reactive, ref } from "vue"
 
 
 const credentials = reactive({
-phone:null
+    phone:null,
+    login_code:null
+})
+
+const waitingOnVerification = ref(false)
+
+// if the user is already logged in push to the index page
+onMounted(() => {
+    if (localStorage.getItem('token')) {
+        router.push({
+            name: 'landing'
+        })
+    }
 })
 
 
+// computed property for phone & code
+const getFormattedCredentials = ()=> {
+    return {
+        phone: credentials.phone.replaceAll(' ', '').replace('(', '').replace(')', '').replace('-', ''),
+        login_code: credentials.login_code
+    }
+}
+
+
 const handleLogin = () => {
-    axios.post('http://backend.test/api/login', {
-        phone: credentials.phone.replaceAll(' ', '').replace('(', '').replace(')', '').replace('-', '')
-    })
+    axios.post('http://backend.test/api/login', getFormattedCredentials)
     .then((response)=> {
         console.log(response.data)
+        waitingOnVerification.value = true
     })
     .catch((error)=> {
         console.error(error)
@@ -44,4 +43,58 @@ const handleLogin = () => {
     })
 }
 
+const handleVerification = () => {
+    axios.post('http://backend.test/api/login/verify', getFormattedCredentials)
+        .then((response)=> {
+            console.log(response.data) //auth token
+            localStorage.setItem('token', response.data)
+            router.push({
+                name: 'landing'
+            })
+
+        })
+        .catch((error)=> {
+            console.log(error)
+            alert(error.response.data.message)
+        })
+}
+
 </script>
+<template>
+    <div class="pt-16">
+        <h1 class="text-3xl font-semibold mb-4">Enter your phone number</h1>
+        <form v-if="!waitingOnVerification" action="#" @submit.prevent="handleLogin">
+            <div class="overflow-hidden shadow sm:rounded-md max-w-sm mx-auto text-left">
+                <div class="bg-white px-4 py-5 sm:p-6">
+                    <div>
+                        <input type="text" v-maska data-maska="#############" v-model="credentials.phone" name="phone" placeholder="+254XXXXXXXXX"
+                        class="mt-1 block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm">
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 text-right sm:px-6">
+                    <button type="submit" @submit.prevent="handleLogin" class="inline-flex justify-center rounded-md border border-transparent bg-black py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-gray-600 focus:outline-none">
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <form v-else action="#" @submit.prevent="handleVerification">
+            <div class="overflow-hidden shadow sm:rounded-md max-w-sm mx-auto text-left">
+                <div class="bg-white px-4 py-5 sm:p-6">
+                    <div>
+                        <input type="text" v-maska data-maska="######" v-model="credentials.login_code" id="login_code" placeholder="123456"
+                            class="mt-1 block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-black focus:outline-none">
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 text-right sm:px-6">
+                    <button type="submit" @submit.prevent="handleVerification" 
+                        class="inline-flex justify-center rounded-md border border-transparent bg-black py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-gray-600 focus:outline-none">
+                        Verify
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</template>
