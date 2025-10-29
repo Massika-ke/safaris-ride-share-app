@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LandingView from '@/views/LandingView.vue'
 import axios from 'axios'
+import LocationView from '@/views/LocationView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,13 +16,18 @@ const router = createRouter({
       path: '/landing',
       name: 'landing',
       component: LandingView
+    },
+    {
+      path: '/location',
+      name: 'location',
+      component: LocationView
     }
   ],
 })
 
 // redirect routes for auth/login
 router.beforeEach((to, from) => {
-  if (to.name === 'login') {
+  if (to.name = 'login') {
     return true
   }
 

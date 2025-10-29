@@ -1,9 +1,11 @@
 <script setup>
-import router from "@/router"
 import axios from "axios"
 import { vMaska } from "maska/vue"
 import { computed, onMounted, reactive, ref } from "vue"
+import { useRouter } from "vue-router"
 
+
+const router = useRouter()
 
 const credentials = reactive({
     phone:null,
@@ -18,33 +20,41 @@ onMounted(() => {
         router.push({
             name: 'landing'
         })
-    }
+    }      
 })
 
 
 // computed property for phone & code
-const getFormattedCredentials = ()=> {
+// const getFormattedCredentials = ()=> {
+//     return {
+//         phone: credentials.phone.replaceAll(' ', '').replace('(', '').replace(')', '').replace('-', ''),
+//         login_code: credentials.login_code
+//     }
+// }
+
+const getFormattedCredentials = () => {
     return {
-        phone: credentials.phone.replaceAll(' ', '').replace('(', '').replace(')', '').replace('-', ''),
+        phone: credentials.phone ? credentials.phone.replace(/\s/g, '') : null, // Remove all spaces
         login_code: credentials.login_code
     }
 }
 
-
 const handleLogin = () => {
-    axios.post('http://backend.test/api/login', getFormattedCredentials)
+    axios.post('http://backend.test/api/login', getFormattedCredentials())
+
     .then((response)=> {
         console.log(response.data)
         waitingOnVerification.value = true
     })
     .catch((error)=> {
         console.error(error)
-        alert(error.response.message)
+        alert(error.response?.data?.message || 'Login Failed')
     })
 }
 
 const handleVerification = () => {
-    axios.post('http://backend.test/api/login/verify', getFormattedCredentials)
+    axios.post('http://backend.test/api/login/verify', getFormattedCredentials())
+
         .then((response)=> {
             console.log(response.data) //auth token
             localStorage.setItem('token', response.data)
@@ -67,7 +77,7 @@ const handleVerification = () => {
             <div class="overflow-hidden shadow sm:rounded-md max-w-sm mx-auto text-left">
                 <div class="bg-white px-4 py-5 sm:p-6">
                     <div>
-                        <input type="text" v-maska data-maska="#############" v-model="credentials.phone" name="phone" placeholder="+254XXXXXXXXX"
+                        <input type="text" v-maska data-maska="+254 ### ### ###" v-model="credentials.phone" name="phone" placeholder="+254 712 345 678"
                         class="mt-1 block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm">
                     </div>
                 </div>
