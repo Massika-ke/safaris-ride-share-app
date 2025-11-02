@@ -19,6 +19,7 @@
     "vue3-google-map": "^0.25.0"
   },
   "devDependencies": {
+    "@fawmi/vue-google-maps": "^0.9.79",
     "@vitejs/plugin-vue": "^6.0.1",
     "autoprefixer": "^10.4.21",
     "axios": "^1.12.2",
