@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import LandingView from '@/views/LandingView.vue'
 import axios from 'axios'
 import LocationView from '@/views/LocationView.vue'
+import MapView from '@/views/MapView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,6 +22,11 @@ const router = createRouter({
       path: '/location',
       name: 'location',
       component: LocationView
+    },
+    {
+      path: '/map',
+      name: 'map',
+      component: MapView
     }
   ],
 })

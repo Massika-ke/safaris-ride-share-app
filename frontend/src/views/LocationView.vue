@@ -50,6 +50,7 @@ const handLocationChanged = (e) => {
 <script setup>
 import { ref } from 'vue';
 import { useLocationStore } from '@/stores/location';
+import router from '@/router';
 
 const location = useLocationStore();
 const searchQuery = ref('');
@@ -125,13 +126,22 @@ const handleBlur = () => {
         showResults.value = false;
     }, 200);
 };
+
+const handleSelectLocation = () => {
+    if (location.destination.name === '') {
+        router.push({
+            name: 'map'
+        })
+    }
+}
+
 </script>
 
 <template>
     <div class="pt-16">
         <h1 class="text-3xl font-semibold mb-4">Where are we going?</h1>
         <form action="#" @submit.prevent>
-            <div class="overflow-hidden shadow sm:rounded-md max-w-sm mx-auto text-left">
+            <div class="overflow-hidden shadow sm:rounded-md max-w-sm mx-auto text-left relative">
                 <div class="bg-white px-4 py-5 sm:p-6">
                     <div class="relative">
                         <input
@@ -176,9 +186,10 @@ const handleBlur = () => {
                 </div>
             </div>
             <div class="bg-gray-50 px-4 py-3 text-right sm:px-6">
-                <button 
+                <button
+                    @click.prevent="handleSelectLocation"
                     type="button" 
-                    class="inline-flex justify-center rounded-md border-transparent bg-black text-white py-2 px-4 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="inline-flex items-center justify-center gap-2 rounded-md bg-black text-white py-2.5 px-6 font-medium transition-all hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     :disabled="!location.destination"
                 >
                     Find a Ride
